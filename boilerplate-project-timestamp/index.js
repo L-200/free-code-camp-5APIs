@@ -24,9 +24,23 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+app.get("/api", (req, res, next) => {
+
+  req.time = new Date(); 
+  next();
+}, (req, res) => {
+  res.json({unix: req.time.getTime(), utc: req.time.toUTCString()
+  });
+});
+
 
 
 // Listen on port set in environment variable or default to 3000
-var listener = app.listen(process.env.PORT || 3000, function () {
-  console.log('Your app is listening on port ' + listener.address().port);
-});
+if (require.main === module) {
+  var listener = app.listen(process.env.PORT || 3000, function () {
+    console.log('Your app is listening on port ' + listener.address().port);
+  });
+}
+
+module.exports = app;
+
