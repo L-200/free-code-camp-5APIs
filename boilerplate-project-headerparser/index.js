@@ -25,6 +25,10 @@ app.get('/api/hello', function (req, res) {
 });
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT || 3000, function () {
-  console.log('Your app is listening on port ' + listener.address().port);
-});
+if (require.main === module) {
+  var listener = app.listen(process.env.PORT || 3000, function () {
+    console.log('Your app is listening on port ' + listener.address().port);
+  });
+}
+
+module.exports = app;
