@@ -68,6 +68,20 @@ app.post('/api/shorturl', async (req, res) => {
   }
 });
 
+app.get('/api/shorturl/:shorturl', async (req, res) => {
+
+  const shortenedUrl = req.params.shorturl;
+
+  const urlFound = await Url.findOne({
+    shortVersion: shortenedUrl
+  });
+
+  if (!urlFound) {
+    return res.json({ error: "URL not found" });
+  }
+
+  res.redirect(urlFound.longVersion);
+});
 
 if (require.main === module) {
   mongoose.connect(process.env.MONGO_URI, {
