@@ -19,6 +19,10 @@ app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
 
-app.listen(port, function() {
-  console.log(`Listening on port ${port}`);
-});
+if (require.main === module) {
+  app.listen(port, function() {
+    console.log(`Listening on port ${port}`);
+  });
+}
+
+module.exports = app;
