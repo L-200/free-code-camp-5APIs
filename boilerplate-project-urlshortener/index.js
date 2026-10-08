@@ -2,13 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const dns = require("dns")
 
 const mongoose = require('mongoose');
-
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
 
 const urlSchema = new mongoose.Schema({
   longVersion: { type: String, required: true },
@@ -24,9 +20,17 @@ app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+function domain_exists(hostname) {
+  return new Promise((resolve) => {
+    dns.lookup(hostname, (err) => {
+      resolve(!err)
+    })
+  })
+}
+
 app.use('/public', express.static(`${process.cwd()}/public`));
 
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
@@ -36,16 +40,41 @@ app.get('/api/hello', function (req, res) {
 });
 
 app.post('/api/shorturl', async (req, res) => {
-  oldUrl = req.body.url
-  var newUrl = new Url({ longVersion: oldUrl, shortVersion: 1 })
+  const oldUrl = req.body.url;
 
-  await (newUrl.save())
+  try {
+    const parsedUrl = new URL(oldUrl);
 
-  res.json({ original_url: newUrl.longVersion, short_url: newUrl.shortVersion })
-})
+    const exists = await domain_exists(parsedUrl.hostname);
+
+    if (!exists) {
+      return res.json({ error: "Invalid URL" });
+    }
+
+    const last = await Url.findOne().sort({ shortVersion: -1 });
+    const newUrl = new Url({
+      longVersion: oldUrl,
+      shortVersion: last ? last.shortVersion + 1 : 1
+    });
+    await newUrl.save();
+
+    res.json({
+      original_url: newUrl.longVersion,
+      short_url: newUrl.shortVersion
+    });
+  } catch (err) {
+    console.error(err);
+    res.json({ error: "Invalid URL" });
+  }
+});
 
 
 if (require.main === module) {
+  mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
   app.listen(port, function () {
     console.log(`Listening on port ${port}`);
   });
