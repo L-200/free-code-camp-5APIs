@@ -2,3 +2,4 @@
 *.env
 !*sample.env
 *roadmap.md
+*/tests/
