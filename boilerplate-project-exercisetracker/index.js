@@ -74,6 +74,49 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
   }
 });
 
+app.get('/api/users/:_id/logs', async (req, res) => {
+  const { _id } = req.params;
+  const { from, to, limit } = req.query;
+
+  try {
+    const user = await User.findById(_id);
+    if (!user) {
+      console.log('Usuario não encontrados')
+    }
+
+    const filter = { userID: _id };
+    if (from || to) {
+      filter.date = {};
+      if (from) {
+        filter.date.$gte = new Date(from);
+      }
+      if (to) {
+        filter.date.$lte = new Date(to);
+      }
+    }
+
+    query = Exercise.find(filter);
+    if (limit) {
+      query = query.limit(parseInt(limit, 10));
+    }
+
+    const exercises = await query.exec();
+    const log = exercises.map(ex => ({
+      description: ex.description,
+      duration: ex.duration,
+      date: ex.date.toDateString()
+    }));
+    res.json({
+      _id: user._id,
+      username: user.username,
+      count: log.length,
+      log
+    });
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 if (require.main === module) {
   mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
