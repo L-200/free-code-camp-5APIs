@@ -7,7 +7,6 @@
 ![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?logo=mongodb&logoColor=white)
 ![Mongoose](https://img.shields.io/badge/Mongoose-880000?logo=mongoose&logoColor=white)
 ![npm](https://img.shields.io/badge/npm-CB3837?logo=npm&logoColor=white)
-![License](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)
 
 Coleção de microsserviços desenvolvidos como parte da certificação Back End Development and APIs do freeCodeCamp. Cada diretório deste repositório representa uma aplicação Node.js autônoma, projetada para atender a casos de uso específicos de desenvolvimento backend e manipulação de protocolos de rede HTTP.
 
